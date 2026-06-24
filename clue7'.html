@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escape Game Clues</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    background: white;
+    text-align: center;
+}
+
+#timerBtn {
+    margin-top: 20px;
+    padding: 12px 24px;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.audioBtn {
+    display: none;
+    margin-top: 40px;
+    padding: 20px 35px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#secretToggle {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    width: 70px;
+    height: 70px;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 9999;
+}
+</style>
+</head>
+
+<body>
+
+<button id="timerBtn">Start clues</button>
+
+<br>
+
+<button id="clue1Btn" class="audioBtn">
+🎧 Listen to clue 1
+</button>
+
+<br>
+
+<button id="clue2Btn" class="audioBtn">
+🎧 Listen to clue 2
+</button>
+
+<div id="secretToggle"></div>
+
+<script>
+
+const timerBtn = document.getElementById("timerBtn");
+const clue1Btn = document.getElementById("clue1Btn");
+const clue2Btn = document.getElementById("clue2Btn");
+const secretToggle = document.getElementById("secretToggle");
+
+const clue1Audio = new Audio("clue 7'1.mp3");
+const clue2Audio = new Audio("clue 7'2.mp3");
+
+let timerStarted = false;
+let secretVisible = false;
+
+function formatTime(seconds) {
+    const m = String(Math.floor(seconds / 60)).padStart(2, "0");
+    const s = String(seconds % 60).padStart(2, "0");
+    return `${m}:${s}`;
+}
+
+function startCountdown(duration, label, callback) {
+
+    const endTime = Date.now() + duration * 1000;
+
+    const interval = setInterval(() => {
+
+        const remaining = Math.max(
+            0,
+            Math.ceil((endTime - Date.now()) / 1000)
+        );
+
+        timerBtn.textContent =
+            `${label} ${formatTime(remaining)}`;
+
+        if (remaining === 0) {
+            clearInterval(interval);
+            callback();
+        }
+
+    }, 250);
+}
+
+timerBtn.addEventListener("click", () => {
+
+    if (timerStarted) return;
+
+    timerStarted = true;
+
+    startCountdown(150, "Clue 1 in", () => {
+
+        clue1Btn.style.display = "inline-block";
+
+        startCountdown(150, "Clue 2 in", () => {
+
+            clue2Btn.style.display = "inline-block";
+
+            timerBtn.textContent = "All clues available";
+
+        });
+
+    });
+
+});
+
+clue1Btn.addEventListener("click", () => {
+    clue1Audio.currentTime = 0;
+    clue1Audio.play();
+});
+
+clue2Btn.addEventListener("click", () => {
+    clue2Audio.currentTime = 0;
+    clue2Audio.play();
+});
+
+secretToggle.addEventListener("click", () => {
+
+    secretVisible = !secretVisible;
+
+    if (secretVisible) {
+        clue1Btn.style.display = "inline-block";
+        clue2Btn.style.display = "inline-block";
+    } else {
+        if (!timerStarted) {
+            clue1Btn.style.display = "none";
+            clue2Btn.style.display = "none";
+        }
+    }
+
+});
+
+</script>
+
+</body>
+</html>
